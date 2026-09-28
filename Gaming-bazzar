@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gaming-Mall - Official Store</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary: #cce600; 
+      --bg-dark: #0a0d16;
+      --card-bg: #131826;
+      --card-border: #1e263d;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --info: #38bdf8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-dark); color: var(--text-main); padding-top: 65px; padding-bottom: 75px; }
+
+    #toast {
+      display: none; position: fixed; top: 75px; left: 50%; transform: translateX(-50%);
+      background: var(--success); color: #000; font-weight: 700; padding: 10px 22px;
+      border-radius: 30px; font-size: 0.85rem; z-index: 99999; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    }
+
+    /* TOP BAR */
+    .top-bar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #0e1320; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 1000; }
+    .brand-logo { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 900; color: var(--text-main); }
+    .brand-logo span { color: var(--primary); }
+    
+    .header-icons { display: flex; align-items: center; gap: 16px; }
+    .cart-wrapper { position: relative; cursor: pointer; }
+    .cart-wrapper i { color: var(--primary); font-size: 1.3rem; }
+    .cart-badge { position: absolute; top: -6px; right: -8px; background: var(--danger); color: white; font-size: 0.65rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+    /* BANNER */
+    .hero-banner { text-align: center; padding: 16px 15px; border-bottom: 1px solid var(--card-border); background: #0c101c; }
+    .hero-banner h1 { font-family: 'Rajdhani', sans-serif; font-size: 1.6rem; font-weight: 700; color: #fff; }
+    .hero-banner p { color: var(--primary); font-size: 0.82rem; letter-spacing: 1px; margin-top: 2px; font-weight: 600; }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 15px; }
+    .section-title { font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; font-weight: 700; color: #fff; margin: 18px 0 12px; display: flex; align-items: center; gap: 8px; }
+
+    /* GAME HUBS */
+    .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .hub-card {
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px;
+      overflow: hidden; cursor: pointer; position: relative;
+    }
+    .hub-card:active { transform: scale(0.97); }
+    .hub-card-img { width: 100%; height: 115px; object-fit: cover; }
+    .hub-content { padding: 10px; text-align: center; }
+    .hub-tag { background: var(--danger); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
+    .hub-title { font-family: 'Rajdhani', sans-serif; font-size: 1.15rem; font-weight: 700; color: #fff; }
+    .hub-btn { color: var(--primary); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-top: 4px; display: block; }
+
+    /* PHYSICAL GEAR GRID */
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+    .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; }
+    .product-img { width: 100%; height: 145px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background: #000; }
+    .item-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; color: #fff; line-height: 1.3; }
+    .item-desc { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px; flex: 1; }
+    
+    .price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+    .price { color: var(--primary); font-size: 1.3rem; font-weight: 800; font-family: 'Rajdhani', sans-serif; }
+    .mrp { text-decoration: line-through; color: var(--text-muted); font-size: 0.8rem; }
+
+    .card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .btn-action { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 9px 5px; border-radius: 6px; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; text-align: center; }
+    .btn-buy { background: var(--primary); color: #000; border: none; }
+
+    /* BOTTOM NAV */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #0e1320; border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-muted); font-size: 0.7rem; cursor: pointer; }
+    .nav-item i { font-size: 1.15rem; }
+    .nav-item.active { color: var(--primary); }
+
+    /* POPUPS & MODALS */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 20000; justify-content: center; align-items: center; padding: 15px; }
+    .modal-box { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; width: 100%; max-width: 440px; padding: 18px; color: var(--text-main); max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
+    
+    input { width: 100%; background: #090c14; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; margin-bottom: 10px; outline: none; font-size: 0.85rem; }
+    input:focus { border-color: var(--primary); }
+
+    .plan-item { background: #090c14; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .plan-title { font-weight: 700; font-size: 0.95rem; color: #fff; }
+    .plan-desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .plan-price { font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+    .plan-mrp { text-decoration: line-through; font-size: 0.75rem; color: var(--text-muted); margin-left: 4px; }
+
+    .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #1e263d; font-size: 0.85rem; }
+    .cart-remove-btn { color: #ef4444; cursor: pointer; margin-left: 10px; }
+
+    .qr-container { background: #fff; padding: 8px; border-radius: 10px; display: inline-block; margin: 8px 0; }
+    .qr-container img { width: 175px; height: 175px; object-fit: contain; display: block; }
+    .upi-badge { background: #090c14; border: 1px dashed var(--primary); padding: 5px 10px; border-radius: 6px; font-size: 0.85rem; color: var(--primary); margin-bottom: 8px; display: inline-block; }
+
+    .profile-card { background: #090c14; border: 1px solid var(--card-border); border-radius: 10px; padding: 14px; margin-bottom: 15px; }
+    .track-order-card { background: #090c14; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; text-align: left; }
+    .track-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+    .track-badge.pending_payment { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+  </style>
+
+  <!-- CRITICAL: JAVASCRIPT IS DECLARED IN HEAD SO BUTTONS NEVER FAIL -->
+  <script>
+    var cartItems = [];
+    try { cartItems = JSON.parse(localStorage.getItem('gm_cart')) || []; } catch(e){}
+
+    var activeOrder = null;
+    var currentAuthMode = "login";
+    var loggedInUser = null;
+    try { loggedInUser = JSON.parse(localStorage.getItem('gm_active_user')) || null; } catch(e){}
+
+    // SAFE MODAL CONTROLLER (NEVER THROWS REFERENCE ERROR)
+    window.toggleModal = function(id, open) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.style.display = open ? 'flex' : 'none';
+      }
+    };
+
+    window.showPopupToast = function(msg) {
+      var t = document.getElementById('toast');
+      if (t) {
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(function() { t.style.display = 'none'; }, 2000);
+      }
+    };
+
+    window.refreshCartCount = function() {
+      var c = document.getElementById('cartCount');
+      if (c) c.innerText = cartItems.length;
+    };
+
+    window.addItemToCart = function(name, price) {
+      cartItems.push({ name: name, price: price });
+      try { localStorage.setItem('gm_cart', JSON.stringify(cartItems)); } catch(e){}
+      window.refreshCartCount();
+      window.showPopupToast(name + " Added! 🛒");
+    };
+
+    window.removeSingleItemFromCart = function(idx) {
+      cartItems.splice(idx, 1);
+      try { localStorage.setItem('gm_cart', JSON.stringify(cartItems)); } catch(e){}
+      window.refreshCartCount();
+      window.drawCartUI();
+    };
+
+    window.drawCartUI = function() {
+      var list = document.getElementById('cartList');
+      var total = 0;
+      if (!list) return;
+      if (cartItems.length === 0) {
+        list.innerHTML = "<p style='color:var(--text-muted); text-align:center; padding:15px 0;'>Cart khali hai</p>";
+      } else {
+        var str = "";
+        for (var i = 0; i < cartItems.length; i++) {
+          total += cartItems[i].price;
+          str += "<div class='cart-item-row'><span>" + cartItems[i].name + "</span><div><strong>₹" + cartItems[i].price + "</strong><i class='fa-solid fa-trash-can cart-remove-btn' onclick='window.removeSingleItemFromCart(" + i + ")'></i></div></div>";
+        }
+        list.innerHTML = str;
+      }
+      var totalEl = document.getElementById('cartTotalVal');
+      if (totalEl) totalEl.innerText = total;
+    };
+
+    window.toggleCartModal = function(open) {
+      if (open) window.drawCartUI();
+      window.toggleModal('cartModal', open);
+    };
+
+    window.startBuyProcess = function(itemName, amount, type) {
+      activeOrder = { name: itemName, amount: amount, type: type };
+      
+      var titleEl = document.getElementById('payModalTitle');
+      var amtEl = document.getElementById('payModalAmount');
+      if (titleEl) titleEl.innerText = itemName;
+      if (amtEl) amtEl.innerText = "₹" + amount;
+      
+      var upiUri = "upi://pay?pa=bgmiitoo@fam&pn=GamingMall&am=" + amount + "&cu=INR&tn=" + encodeURIComponent(itemName);
+      var qr = document.getElementById('upiQrCodeImg');
+      if (qr) qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent(upiUri);
+
+      var label = document.getElementById('orderDynamicLabel');
+      var addrInp = document.getElementById('orderCustAddr');
+      if (type === 'gear') {
+        if (label) label.innerText = "Delivery Address (Pincode & City) *";
+        if (addrInp) addrInp.placeholder = "Apna poora address daalein";
+      } else {
+        if (label) label.innerText = "Character ID / Free Fire UID *";
+        if (addrInp) addrInp.placeholder = "e.g. 5182947192 (Sahi ID daalein)";
+      }
+
+      if (loggedInUser) {
+        var n = document.getElementById('orderCustName');
+        var p = document.getElementById('orderCustPhone');
+        if (n) n.value = loggedInUser.name || "";
+        if (p) p.value = loggedInUser.phone || "";
+      }
+
+      window.toggleModal('paymentModal', true);
+    };
+
+    window.checkoutAllCart = function() {
+      if (cartItems.length === 0) return window.showPopupToast("Cart empty!");
+      var total = parseInt(document.getElementById('cartTotalVal').innerText) || 0;
+      var names = [];
+      for (var i = 0; i < cartItems.length; i++) names.push(cartItems[i].name);
+      window.toggleCartModal(false);
+      window.startBuyProcess(names.join(', '), total, 'mixed');
+    };
+
+    window.confirmOrderPlacement = function() {
+      var name = document.getElementById('orderCustName').value.trim();
+      var phone = document.getElementById('orderCustPhone').value.trim();
+      var addr = document.getElementById('orderCustAddr').value.trim();
+      var utr = document.getElementById('utrNumberInp').value.trim();
+
+      if (!name || phone.length < 10) return window.showPopupToast("Naam & 10-digit Phone daalein!");
+      if (!addr) return window.showPopupToast("ID ya Address daalna zaroori hai!");
+      if (utr.length < 6) return window.showPopupToast("12-digit UTR Ref number daalein!");
+
+      var orderNum = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+      var totalPaise = (activeOrder ? activeOrder.amount : 0) * 100;
+
+      var newOrder = {
+        order_number: orderNum,
+        customer_name: name,
+        customer_phone: phone,
+        delivery_address: addr,
+        total_amount_paise: totalPaise,
+        status: "pending_payment",
+        utr_number: utr,
+        tracking_note: (activeOrder ? activeOrder.name : "Item") + " - Verification Pending"
+      };
+
+      var savedOrders = [];
+      try { savedOrders = JSON.parse(localStorage.getItem('gm_orders_' + phone)) || []; } catch(e){}
+      savedOrders.unshift(newOrder);
+      localStorage.setItem('gm_orders_' + phone, JSON.stringify(savedOrders));
+
+      window.toggleModal('paymentModal', false);
+      alert("Order " + orderNum + " Submit ho gaya! Status Profile me dekhein.");
+
+      cartItems = [];
+      try { localStorage.removeItem('gm_cart'); } catch(e){}
+      window.refreshCartCount();
+
+      loggedInUser = { name: name, phone: phone };
+      localStorage.setItem('gm_active_user', JSON.stringify(loggedInUser));
+
+      window.toggleProfileModal(true);
+    };
+
+    window.toggleProfileModal = function(open) {
+      if (open) window.renderCurrentProfile();
+      window.toggleModal('profileModal', open);
+    };
+
+    window.setAuthMode = function(mode) {
+      currentAuthMode = mode;
+      var lBtn = document.getElementById('tabLoginBtn');
+      var rBtn = document.getElementById('tabRegisterBtn');
+      var nGroup = document.getElementById('registerNameGroup');
+      var sBtn = document.getElementById('authSubmitBtn');
+
+      if (mode === 'login') {
+        if (lBtn) lBtn.classList.add('active');
+        if (rBtn) rBtn.classList.remove('active');
+        if (nGroup) nGroup.style.display = 'none';
+        if (sBtn) sBtn.innerText = "Login";
+      } else {
+        if (lBtn) lBtn.classList.remove('active');
+        if (rBtn) rBtn.classList.add('active');
+        if (nGroup) nGroup.style.display = 'block';
+        if (sBtn) sBtn.innerText = "Create Account";
+      }
+    };
+
+    window.executeAuth = function() {
+      var phone = document.getElementById('authPhone').value.trim();
+      var password = document.getElementById('authPassword').value.trim();
+
+      if (phone.length < 10 || !password) return alert("10-digit Phone aur Password daalein!");
+
+      if (currentAuthMode === 'register') {
+        var name = document.getElementById('authName').value.trim();
+        if (!name) return alert("Apna naam daalein!");
+
+        loggedInUser = { name: name, phone: phone, pass: password };
+        localStorage.setItem('gm_active_user', JSON.stringify(loggedInUser));
+        localStorage.setItem('gm_user_' + phone, JSON.stringify(loggedInUser));
+        alert("Account ban gaya aur Login ho gaya!");
+        window.renderCurrentProfile();
+      } else {
+        var stored = null;
+        try { stored = JSON.parse(localStorage.getItem('gm_user_' + phone)); } catch(e){}
+
+        if (stored && stored.pass === password) {
+          loggedInUser = stored;
+        } else if (password.length >= 4) {
+          loggedInUser = { name: "Gamer " + phone.slice(-4), phone: phone };
+        } else {
+          return alert("Galat Password!");
+        }
+
+        localStorage.setItem('gm_active_user', JSON.stringify(loggedInUser));
+        alert("Swagat hai, " + loggedInUser.name + "!");
+        window.renderCurrentProfile();
+      }
+    };
+
+    window.logoutCustomer = function() {
+      if (!confirm("Logout karein?")) return;
+      loggedInUser = null;
+      localStorage.removeItem('gm_active_user');
+      window.renderCurrentProfile();
+    };
+
+    window.renderCurrentProfile = function() {
+      var aView = document.getElementById('authView');
+      var pView = document.getElementById('profileView');
+      var navTitle = document.getElementById('navProfileTitle');
+
+      if (loggedInUser) {
+        if (aView) aView.style.display = 'none';
+        if (pView) pView.style.display = 'block';
+        
+        var nameEl = document.getElementById('userDisplayName');
+        var phoneEl = document.getElementById('userDisplayPhone');
+        if (nameEl) nameEl.innerText = loggedInUser.name;
+        if (phoneEl) phoneEl.innerText = "📱 " + loggedInUser.phone;
+        if (navTitle) navTitle.innerText = loggedInUser.name.split(' ')[0];
+
+        var listContainer = document.getElementById('userOrdersList');
+        var orders = [];
+        try { orders = JSON.parse(localStorage.getItem('gm_orders_' + loggedInUser.phone)) || []; } catch(e){}
+
+        if (orders.length === 0) {
+          if (listContainer) listContainer.innerHTML = "<p style='text-align:center; color:var(--text-muted); font-size:0.85rem; padding:15px;'>Aapne abhi tak koi order nahi kiya.</p>";
+        } else {
+          var out = "";
+          for (var i = 0; i < orders.length; i++) {
+            var o = orders[i];
+            var amt = Math.round(o.total_amount_paise / 100);
+            out += "<div class='track-order-card'>";
+            out += "<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;'>";
+            out += "<strong style='color:var(--text-main); font-family:Rajdhani,sans-serif; font-size:1.05rem;'>" + o.order_number + "</strong>";
+            out += "<span class='track-badge " + o.status + "'>Pending Verify</span>";
+            out += "</div>";
+            out += "<div style='font-size:0.85rem; color:var(--primary); font-weight:700; margin-bottom:3px;'>Amount: ₹" + amt + "</div>";
+            out += "<div style='font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;'>" + o.delivery_address + "</div>";
+            if (o.tracking_note) {
+              out += "<div style='margin-top:6px; background:#131826; border-left:3px solid var(--info); padding:5px 8px; border-radius:4px; font-size:0.75rem; color:#cbd5e1;'><i class='fa-solid fa-bolt' style='color:var(--info); margin-right:4px;'></i> " + o.tracking_note + "</div>";
+            }
+            out += "</div>";
+          }
+          if (listContainer) listContainer.innerHTML = out;
+        }
+
+      } else {
+        if (aView) aView.style.display = 'block';
+        if (pView) pView.style.display = 'none';
+        if (navTitle) navTitle.innerText = "Profile";
+      }
+    };
+  </script>
+</head>
+<body>
+
+  <div id="toast">Message</div>
+
+  <!-- HEADER -->
+  <div class="top-bar">
+    <div class="brand-logo">Gaming-<span>Mall</span></div>
+    <div class="header-icons">
+      <div class="cart-wrapper" onclick="window.toggleCartModal(true)">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span class="cart-badge" id="cartCount">0</span>
+      </div>
+      <div style="cursor:pointer;" onclick="window.toggleProfileModal(true)">
+        <i class="fa-solid fa-user-circle" s
